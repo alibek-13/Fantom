@@ -1,12 +1,16 @@
-import Jwt from "jsonwebtoken";
+import tokenService from "../service/tokenService.js";
+
 
 export default (req, res, next) => {
   try {
-    const token = req.headers.authorization.split(' ')[1]
-    if (!token) {
+    const AccessToken = req.headers.authorization.split(' ')[1]
+    if (!AccessToken) {
       return res.status(403).json({ message: "Пользователь не авторизован" })
     }
-    const decodeToken = Jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
+    const decodeToken = tokenService.validateAccessToken(AccessToken)
+    if (!decodeToken) {
+      return res.status(403).json({ message: "Пользователь не авторизован" })
+    }
     req.user = decodeToken
     next()
   } catch (e) {

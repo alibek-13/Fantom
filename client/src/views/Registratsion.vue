@@ -2,19 +2,20 @@
   <div class="auth-main">
     <form @submit.prevent="registration" class="from_user">
       <h1>Sign in</h1>
-      <label>Phone</label>
-      <input
-        class="model"
-        v-model.trim="Phone"
-        type="text"
-        placeholder="Phone"
-      />
+
       <label>Name</label>
       <input
         class="model"
         v-model.trim="UserName"
         type="text"
         placeholder="Name"
+      />
+      <label>Phone</label>
+      <input
+        class="model"
+        v-model.trim="phone"
+        type="text"
+        placeholder="Phone"
       />
       <label>password</label>
       <input
@@ -23,6 +24,7 @@
         type="password"
         placeholder="password"
       />
+
       <button type="submit">Registrstsion</button>
     </form>
   </div>
@@ -32,7 +34,7 @@
 export default {
   data() {
     return {
-      Phone: "",
+      phone: "",
       UserName: "",
       password: "",
     };
@@ -43,8 +45,9 @@ export default {
         phone: this.phone,
         UserName: this.UserName,
         password: this.password,
-      }
-      this.$store.dispatch("registratsion", data)
+      };
+      this.$store
+        .dispatch("registratsion", data)
         .then(() => this.$router.push("/"))
         .catch((err) => console.log(err));
     },

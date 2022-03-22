@@ -29,23 +29,7 @@ class authController {
       console.log(e)
     }
   }
-  async refresh(req, res) {
-    const {refreshToken} = req.cookies
-    if (!refreshToken){
-      return res.status(400).json({message:'Пользователь не авторизован'})
-    }
-    const userData = tokenService.validateRefreshToken(refreshToken)
-    const tokenBD = await tokenModel.findOne({refreshToken})
-    if (!userData || !tokenBD ){
-      return res.status(400).json({message:'Пользователь не авторизован'})
-    }
-    const User = await user.findById(userData.id)
-    const tokens = tokenService.generateTokens(User)
-    await tokenService.saveToken(user.id, tokens.refreshToken)
-    res.cookie('refreshToken', user.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
-    await user.save()
-    return res.json({ User, tokens });
-  }
+
   async login(req, res) {
     try {
       const { phone, password } = req.body
@@ -55,7 +39,7 @@ class authController {
         return res.status(400).json({ message: `Пользователь ${user} не найден` })
       }
 
-      const validPassword = await bcrypt.compareSync(password, user.password);
+      const validPassword = bcrypt.compareSync(password, user.password);
       if (!validPassword) {
         return res.status(400).json({ message: 'Введен неверный пароль' })
       }
@@ -79,7 +63,23 @@ class authController {
       console.log(e)
     }
   }
-
+  async refresh(req, res) {
+    const {refreshToken} = req.cookies
+    if (!refreshToken){
+      return res.status(400).json({message:'Пользователь не авторизован'})
+    }
+    const userData = tokenService.validateRefreshToken(refreshToken)
+    const tokenBD = await tokenModel.findOne({refreshToken})
+    if (!userData || !tokenBD ){
+      return res.status(400).json({message:'Пользователь не авторизован'})
+    }
+    const User = await user.findById(userData.id)
+    const tokens = tokenService.generateTokens(User)
+    await tokenService.saveToken(user.id, tokens.refreshToken)
+    res.cookie('refreshToken', user.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
+    await user.save()
+    return res.json({ User, tokens });
+  }
 
   async getUser(req, res) {
     try {
